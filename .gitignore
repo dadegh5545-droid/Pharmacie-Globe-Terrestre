@@ -16,3 +16,6 @@ amplifyconfiguration*
 .env*.local
 .npm
 data/product-images.generated.json
+
+# Claude Code (reglages locaux, propres a chaque poste)
+.claude/
