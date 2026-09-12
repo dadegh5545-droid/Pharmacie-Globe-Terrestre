@@ -39,12 +39,43 @@ function aws(service, command, extra = []) {
   return stdout.trim() ? JSON.parse(stdout) : null;
 }
 
-/** Retrouve la table d'un modèle : `<Modele>-<apiId>-<branche>`. */
+/**
+ * Identifiant de l'API AppSync visée, retrouvé en comparant l'URL GraphQL de
+ * `amplify_outputs.json` aux APIs du compte.
+ *
+ * Indispensable : plusieurs environnements (bac à sable, production, autres
+ * projets) coexistent dans le même compte et produisent chacun une table
+ * `Product-…`. Choisir « la première qui commence par Product- » viserait
+ * tôt ou tard la mauvaise base.
+ */
+function resolveApiId() {
+  const url = outputs?.data?.url;
+  if (!url) throw new Error('URL AppSync absente de amplify_outputs.json.');
+
+  const { graphqlApis } = aws('appsync', 'list-graphql-apis', ['--max-results', '25']);
+  const match = graphqlApis.find((api) => api.uris?.GRAPHQL === url);
+  if (!match) {
+    throw new Error(
+      `Aucune API AppSync du compte ne correspond à ${url}. ` +
+        'Vérifiez le profil AWS et la région.',
+    );
+  }
+  return match.apiId;
+}
+
+const apiId = resolveApiId();
+
+/** Table d'un modèle, strictement rattachée à l'API ciblée. */
 function findTable(model) {
   const { TableNames } = aws('dynamodb', 'list-tables');
-  const match = TableNames.find((name) => new RegExp(`^${model}-`).test(name));
-  if (!match) throw new Error(`Table introuvable pour le modèle ${model}.`);
-  return match;
+  const matches = TableNames.filter((name) => name.startsWith(`${model}-${apiId}-`));
+  if (matches.length === 0) {
+    throw new Error(`Table introuvable pour ${model} sur l'API ${apiId}.`);
+  }
+  if (matches.length > 1) {
+    throw new Error(`Plusieurs tables pour ${model} sur ${apiId} : ${matches.join(', ')}.`);
+  }
+  return matches[0];
 }
 
 /** Conversion en types DynamoDB ; les valeurs nulles sont simplement omises. */
