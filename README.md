@@ -177,6 +177,14 @@ la connexion réussit mais `/admin` refuse l'accès (et AppSync aussi).
 
 ## Déploiement
 
+### Région AWS : `ap-south-1` (Mumbai)
+
+Choix arrêté par l'exploitant. **Toute nouvelle pile — sandbox comme
+production — doit viser cette même région** : changer de région après coup
+impose de recréer l'intégralité des ressources (pool Cognito, API AppSync,
+tables DynamoDB, bucket S3) et fait perdre les données déjà saisies.
+
+
 **AWS Amplify Hosting** (recommandé, `amplify.yml` est déjà présent) :
 connectez le dépôt Git dans la console Amplify. Le build déploie le backend
 (`ampx pipeline-deploy`) puis le frontend, et génère `amplify_outputs.json`.
