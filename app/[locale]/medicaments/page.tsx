@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import { CatalogBrowser } from '@/components/catalog-browser';
 import { PageHeader } from '@/components/page-header';
 import { Skeleton } from '@/components/ui/skeleton';
-import { products } from '@/data/catalog';
+import { loadCatalog } from '@/lib/catalog-server';
 import { getDictionary } from '@/lib/i18n/dictionaries';
 import { isLocale } from '@/lib/i18n/config';
 
@@ -31,8 +31,9 @@ export default async function MedicinesPage({
   const dict = getDictionary(isLocale(locale) ? locale : 'fr');
 
   // Produits soumis a une validation pharmaceutique possible.
+  const { products } = await loadCatalog();
   const medicines = products.filter(
-    (product) => product.published && product.pharmacistValidation === 'MAY_BE_REQUIRED',
+    (product) => product.pharmacistValidation === 'MAY_BE_REQUIRED',
   );
 
   return (

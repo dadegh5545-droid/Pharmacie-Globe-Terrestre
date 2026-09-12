@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { Search, X } from 'lucide-react';
 import { useI18n } from '@/lib/i18n/context';
-import { products as seedProducts } from '@/data/catalog';
+import { useCatalog } from '@/lib/catalog-context';
 import { searchProducts } from '@/lib/search';
 import { cn } from '@/lib/utils';
 
@@ -25,6 +25,7 @@ export function SearchBar({
   className?: string;
 }) {
   const { t, locale, href } = useI18n();
+  const { products } = useCatalog();
   const router = useRouter();
   const listId = useId();
 
@@ -37,13 +38,8 @@ export function SearchBar({
     () =>
       query.trim().length < 1
         ? []
-        : searchProducts(
-            seedProducts.filter((product) => product.published),
-            query,
-            locale,
-            MAX_SUGGESTIONS,
-          ),
-    [query, locale],
+        : searchProducts(products, query, locale, MAX_SUGGESTIONS),
+    [query, locale, products],
   );
 
   // Ferme la liste lors d'un clic à l'extérieur.

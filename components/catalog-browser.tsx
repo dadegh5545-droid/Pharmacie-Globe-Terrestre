@@ -8,7 +8,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useI18n } from '@/lib/i18n/context';
 import { searchProducts } from '@/lib/search';
-import { usedCategories, type CategoryId, type Product } from '@/data/catalog';
+import { useCatalog } from '@/lib/catalog-context';
+import type { CategoryId, Product } from '@/data/catalog';
 import { cn } from '@/lib/utils';
 
 /**
@@ -18,6 +19,7 @@ import { cn } from '@/lib/utils';
  */
 export function CatalogBrowser({ products }: { products: Product[] }) {
   const { t, locale } = useI18n();
+  const { categories } = useCatalog();
   const router = useRouter();
   const params = useSearchParams();
 
@@ -26,7 +28,11 @@ export function CatalogBrowser({ products }: { products: Product[] }) {
     (params.get('categorie') as CategoryId | null) ?? null,
   );
 
-  const available = useMemo(() => usedCategories(products), [products]);
+  // Seules les categories effectivement representees sont proposees en filtre.
+  const available = useMemo(() => {
+    const used = new Set(products.map((product) => product.categoryId));
+    return categories.filter((category) => used.has(category.id));
+  }, [products, categories]);
 
   const results = useMemo(() => {
     const scoped = category ? products.filter((p) => p.categoryId === category) : products;

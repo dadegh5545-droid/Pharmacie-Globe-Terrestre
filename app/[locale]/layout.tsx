@@ -9,6 +9,8 @@ import { SiteHeader } from '@/components/site-header';
 import { SiteFooter } from '@/components/site-footer';
 import { FloatingContact } from '@/components/floating-whatsapp';
 import { SkipLink } from '@/components/skip-link';
+import { CatalogProvider } from '@/lib/catalog-context';
+import { loadCatalog } from '@/lib/catalog-server';
 import { getDictionary } from '@/lib/i18n/dictionaries';
 import { isLocale, localeDir, locales, type Locale } from '@/lib/i18n/config';
 import { siteConfig } from '@/config/site';
@@ -84,6 +86,9 @@ export default async function LocaleLayout({
   if (!isLocale(locale)) notFound();
   const typedLocale = locale as Locale;
 
+  // Une seule lecture du catalogue par rendu, partagee par toute la page.
+  const catalog = await loadCatalog();
+
   return (
     <html
       lang={typedLocale}
@@ -98,6 +103,7 @@ export default async function LocaleLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd(typedLocale)) }}
         />
         <I18nProvider locale={typedLocale}>
+          <CatalogProvider products={catalog.products} categories={catalog.categories}>
           <RequestProvider>
             <SkipLink />
             <SiteHeader />
@@ -107,6 +113,7 @@ export default async function LocaleLayout({
             <SiteFooter />
             <FloatingContact />
           </RequestProvider>
+          </CatalogProvider>
         </I18nProvider>
       </body>
     </html>

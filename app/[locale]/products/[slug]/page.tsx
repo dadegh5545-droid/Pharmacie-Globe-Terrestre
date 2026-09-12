@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { ProductDetail } from '@/components/product-detail';
-import { getProduct, products } from '@/data/catalog';
+import { loadCatalog } from '@/lib/catalog-server';
 import { getDictionary } from '@/lib/i18n/dictionaries';
 import { isLocale, locales } from '@/lib/i18n/config';
 import { productJsonLd } from '@/lib/seo';
@@ -9,13 +9,15 @@ import { productJsonLd } from '@/lib/seo';
 type Params = { locale: string; slug: string };
 
 /** Toutes les fiches produit sont pre-generees : rendu statique, SEO optimal. */
-export function generateStaticParams() {
+export async function generateStaticParams() {
+  const { products } = await loadCatalog();
   return locales.flatMap((locale) =>
-    products
-      .filter((product) => product.published)
-      .map((product) => ({ locale, slug: product.slug })),
+    products.map((product) => ({ locale, slug: product.slug })),
   );
 }
+
+/** Une fiche ajoutee depuis /admin apres le build est rendue a la demande. */
+export const dynamicParams = true;
 
 export async function generateMetadata({
   params,
@@ -23,7 +25,8 @@ export async function generateMetadata({
   params: Promise<Params>;
 }): Promise<Metadata> {
   const { locale, slug } = await params;
-  const product = getProduct(slug);
+  const { products } = await loadCatalog();
+  const product = products.find((item) => item.slug === slug);
   if (!product || !isLocale(locale)) return {};
   const dict = getDictionary(locale);
 
@@ -52,11 +55,12 @@ export async function generateMetadata({
 
 export default async function ProductPage({ params }: { params: Promise<Params> }) {
   const { locale, slug } = await params;
-  const product = getProduct(slug);
-  if (!product || !product.published) notFound();
+  const { products } = await loadCatalog();
+  const product = products.find((item) => item.slug === slug);
+  if (!product) notFound();
 
   const related = products
-    .filter((item) => item.published && item.categoryId === product.categoryId && item.id !== product.id)
+    .filter((item) => item.categoryId === product.categoryId && item.id !== product.id)
     .slice(0, 4);
 
   return (

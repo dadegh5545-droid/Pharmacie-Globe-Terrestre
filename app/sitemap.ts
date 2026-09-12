@@ -1,7 +1,9 @@
 import type { MetadataRoute } from 'next';
 import { siteConfig } from '@/config/site';
 import { locales } from '@/lib/i18n/config';
-import { products } from '@/data/catalog';
+import { loadCatalog } from '@/lib/catalog-server';
+
+export const revalidate = 300;
 
 const ROUTES = [
   '',
@@ -16,8 +18,9 @@ const ROUTES = [
   '/informations-medicales',
 ];
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
+  const { products } = await loadCatalog();
 
   const pages = locales.flatMap((locale) =>
     ROUTES.map((route) => ({
@@ -34,9 +37,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   );
 
   const productPages = locales.flatMap((locale) =>
-    products
-      .filter((product) => product.published)
-      .map((product) => ({
+    products.map((product) => ({
         url: `${siteConfig.url}/${locale}/products/${product.slug}`,
         lastModified: now,
         changeFrequency: 'weekly' as const,

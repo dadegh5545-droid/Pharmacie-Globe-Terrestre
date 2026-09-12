@@ -8,7 +8,7 @@ import { ProductCard } from '@/components/product-card';
 import { useI18n } from '@/lib/i18n/context';
 import { siteConfig, telHref, whatsappHref } from '@/config/site';
 import { generalMessage } from '@/lib/whatsapp';
-import { categories, products, usedCategories } from '@/data/catalog';
+import { useCatalog } from '@/lib/catalog-context';
 import { cn } from '@/lib/utils';
 
 /** Titre de section réutilisable, avec lien d'action facultatif. */
@@ -43,6 +43,7 @@ export function SectionHeading({
 
 export function Hero() {
   const { t, locale, href } = useI18n();
+  const { products } = useCatalog();
   const wa = whatsappHref(generalMessage(locale));
 
   const badges = [t('hero.badge1'), t('hero.badge2'), t('hero.badge3'), t('hero.badge4')];
@@ -149,6 +150,7 @@ export function SearchSection() {
 
 export function CategoriesSection() {
   const { t, locale, href } = useI18n();
+  const { categories, usedCategories } = useCatalog();
   const shown = usedCategories();
 
   return (
@@ -183,7 +185,8 @@ export function CategoriesSection() {
 
 export function PopularSection() {
   const { t, href } = useI18n();
-  const shown = products.filter((product) => product.published).slice(0, 8);
+  const { products } = useCatalog();
+  const shown = products.slice(0, 8);
 
   return (
     <section className="py-16">

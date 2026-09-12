@@ -23,7 +23,8 @@ import { useI18n } from '@/lib/i18n/context';
 import { useRequest, MAX_QUANTITY } from '@/lib/request-store';
 import { siteConfig, telHref, whatsappHref } from '@/config/site';
 import { singleProductMessage } from '@/lib/whatsapp';
-import { getCategory, type Product } from '@/data/catalog';
+import { useCatalog } from '@/lib/catalog-context';
+import type { Product } from '@/data/catalog';
 
 /** Ligne « libellé / valeur » ; affiche le repli pharmacien si la valeur manque. */
 function Spec({ label, value }: { label: string; value: string | null | undefined }) {
@@ -47,6 +48,7 @@ export function ProductDetail({
 }) {
   const { t, locale, href, pick } = useI18n();
   const { add, has } = useRequest();
+  const { getCategory } = useCatalog();
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
 

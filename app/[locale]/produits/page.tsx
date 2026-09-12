@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import { CatalogBrowser } from '@/components/catalog-browser';
 import { PageHeader } from '@/components/page-header';
 import { Skeleton } from '@/components/ui/skeleton';
-import { products } from '@/data/catalog';
+import { loadCatalog } from '@/lib/catalog-server';
 import { getDictionary } from '@/lib/i18n/dictionaries';
 import { isLocale } from '@/lib/i18n/config';
 
@@ -39,14 +39,14 @@ export default async function ProductsPage({
 }) {
   const { locale } = await params;
   const dict = getDictionary(isLocale(locale) ? locale : 'fr');
-  const published = products.filter((product) => product.published);
+  const { products } = await loadCatalog();
 
   return (
     <>
       <PageHeader title={dict['products.title']} subtitle={dict['products.subtitle']} />
       <div className="container py-10">
         <Suspense fallback={<CatalogSkeleton />}>
-          <CatalogBrowser products={published} />
+          <CatalogBrowser products={products} />
         </Suspense>
       </div>
     </>
