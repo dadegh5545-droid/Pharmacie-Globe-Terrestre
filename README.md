@@ -177,6 +177,24 @@ la connexion réussit mais `/admin` refuse l'accès (et AppSync aussi).
 
 ## Déploiement
 
+### ⚠ État actuel : frontend déployé, backend partagé avec le bac à sable
+
+Le site publié (`main.d18w5j78g95e51.amplifyapp.com`) s'appuie sur le backend
+créé par `ampx sandbox`, et non sur un backend de production dédié : la phase
+`backend` du build est désactivée tant que le rôle de service Amplify n'a pas
+les droits de créer CloudFormation, Cognito, AppSync, DynamoDB et S3.
+
+**Ne lancez pas `npx ampx sandbox delete` : cela couperait le site en ligne.**
+
+Pour passer à un backend de production propre :
+
+1. Accorder les droits au rôle de service Amplify.
+2. Décommenter le bloc `backend:` de `amplify.yml`.
+3. Remettre `amplify_outputs*` dans `.gitignore` et cesser de versionner le
+   fichier — le build le régénère alors lui-même.
+4. Rejouer `npm run seed` et recréer un compte du groupe `admin` : le nouveau
+   backend démarre avec des tables et un pool Cognito vides.
+
 ### Région AWS : `ap-south-1` (Mumbai)
 
 Choix arrêté par l'exploitant. **Toute nouvelle pile — sandbox comme
