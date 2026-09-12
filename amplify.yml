@@ -1,16 +1,36 @@
 version: 1
-backend:
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  ETAPE ACTUELLE : deploiement du frontend uniquement.
+#
+#  La phase `backend` (ampx pipeline-deploy) est volontairement desactivee :
+#  elle exige que le role de service Amplify puisse creer CloudFormation,
+#  Cognito, AppSync, DynamoDB et S3. Ces droits seront accordes plus tard.
+#
+#  En attendant, le site publie s'appuie sur le backend deja deploye
+#  (`amplify_outputs.json`, versionne pour cette raison). Il est donc
+#  pleinement fonctionnel : catalogue, ordonnances et back-office.
+#
+#  POUR REACTIVER LE BACKEND PLUS TARD : retirer les commentaires du bloc
+#  ci-dessous, et cesser de versionner `amplify_outputs.json` (le build le
+#  regenere alors lui-meme).
+#
+#  backend:
+#    phases:
+#      build:
+#        commands:
+#          - npm install --cache .npm --prefer-offline
+#          - npx ampx pipeline-deploy --branch $AWS_BRANCH --app-id $AWS_APP_ID
+# ─────────────────────────────────────────────────────────────────────────────
+
+frontend:
   phases:
-    build:
+    preBuild:
       commands:
         # `npm install` et non `npm ci` : @aws-amplify/backend-cli tire des
         # dependances (@aws-cdk/toolkit-lib et sa cascade) que npm n'inscrit
-        # pas dans le lockfile. `npm ci`, qui exige une correspondance exacte,
-        # echoue donc systematiquement — regenerer le lockfile n'y change rien.
+        # pas dans le lockfile, ce qui fait echouer `npm ci` a tous les coups.
         - npm install --cache .npm --prefer-offline
-        - npx ampx pipeline-deploy --branch $AWS_BRANCH --app-id $AWS_APP_ID
-frontend:
-  phases:
     build:
       commands:
         - npm run build

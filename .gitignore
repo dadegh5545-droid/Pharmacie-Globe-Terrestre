@@ -7,8 +7,11 @@ next-env.d.ts
 *.tsbuildinfo
 
 # amplify
+# amplify_outputs.json est volontairement versionne : le build ne deploie
+# pas encore le backend, le site publie doit donc pointer vers celui existant.
+# Il ne contient que de la configuration client publique (ids de pool, URL
+# AppSync, cle d API en lecture seule) — deja visible dans le bundle navigateur.
 .amplify
-amplify_outputs*
 amplifyconfiguration*
 
 # divers
