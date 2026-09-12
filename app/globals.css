@@ -1,0 +1,90 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 200 20% 12%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 200 20% 12%;
+
+    --primary: 162 72% 32%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 172 45% 95%;
+    --secondary-foreground: 164 70% 22%;
+
+    --muted: 180 14% 96%;
+    --muted-foreground: 200 8% 44%;
+
+    --accent: 172 60% 94%;
+    --accent-foreground: 164 70% 22%;
+
+    --destructive: 0 72% 45%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 180 12% 90%;
+    --input: 180 12% 88%;
+    --ring: 162 72% 32%;
+
+    --radius: 0.85rem;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: 'cv02', 'cv03', 'cv04';
+  }
+
+  html[dir='rtl'] body {
+    @apply font-arabic;
+  }
+
+  /* Focus visible homogene et toujours lisible (WCAG 2.4.7). */
+  :focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
+
+  ::selection {
+    @apply bg-primary-100 text-primary-700;
+  }
+}
+
+@layer components {
+  /* Fond degrade tres discret des sections claires. */
+  .section-muted {
+    @apply bg-gradient-to-b from-muted/60 to-background;
+  }
+
+  /* Motif medical subtil du hero. */
+  .hero-pattern {
+    background-image:
+      radial-gradient(closest-side, hsl(162 72% 32% / 7%), transparent),
+      radial-gradient(closest-side, hsl(190 70% 45% / 6%), transparent);
+    background-position: 8% -20%, 92% 120%;
+    background-size: 55% 120%, 55% 120%;
+    background-repeat: no-repeat;
+  }
+
+  .skip-link {
+    @apply sr-only focus:not-sr-only focus:absolute focus:start-4 focus:top-4 focus:z-[100]
+           focus:rounded-lg focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground;
+  }
+}
+
+/* Respecte la preference systeme de mouvement reduit. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
