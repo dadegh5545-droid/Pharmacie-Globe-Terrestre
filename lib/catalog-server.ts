@@ -8,6 +8,16 @@ import {
   type Product,
 } from '@/data/catalog';
 import type { Availability } from '@/config/site';
+import localImages from '@/data/product-images.generated.json';
+
+/**
+ * Photo locale deposee dans `public/products/`, nommee d'apres le slug.
+ * Sert de repli quand la fiche en base n'a pas d'`imageUrl` : deposer le
+ * fichier suffit, sans retoucher DynamoDB.
+ */
+function localImage(slug: string): string | null {
+  return (localImages as Record<string, string>)[slug] ?? null;
+}
 
 /**
  * Chargement du catalogue côté serveur.
@@ -137,7 +147,7 @@ function toProduct(raw: RawProduct): Product {
     promoPrice: raw.promoPrice,
     sku: raw.sku,
     barcode: raw.barcode,
-    image: raw.imageUrl,
+    image: raw.imageUrl || localImage(raw.slug || raw.id),
     featured: raw.featured ?? false,
     published: raw.published ?? true,
   };
