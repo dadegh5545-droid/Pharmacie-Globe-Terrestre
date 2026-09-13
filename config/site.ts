@@ -30,12 +30,11 @@ export const siteConfig = {
     phones: ['62 18 10 30', '97 43 41 11'],
 
     /**
-     * ⚠ Indicatif international — À RENSEIGNER.
-     * Exemple : '216' (Tunisie), '212' (Maroc), '213' (Algérie), '33' (France).
-     * Tant que cette valeur est vide, les liens `tel:` utilisent le numéro local
-     * et les boutons WhatsApp sont désactivés (WhatsApp exige un numéro complet).
+     * Indicatif international : 235 (Tchad), communiqué par la pharmacie.
+     * Sans lui, les boutons WhatsApp seraient désactivés — `wa.me` exige un
+     * numéro complet. Surchargeable par NEXT_PUBLIC_COUNTRY_CODE.
      */
-    countryCode: process.env.NEXT_PUBLIC_COUNTRY_CODE || '',
+    countryCode: process.env.NEXT_PUBLIC_COUNTRY_CODE || '235',
 
     /** Numéro recevant les demandes WhatsApp (index dans `phones`). */
     whatsappPhoneIndex: 0,
